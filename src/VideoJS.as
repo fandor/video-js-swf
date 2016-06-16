@@ -17,8 +17,10 @@ package{
     import flash.system.Security;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
+    import flash.ui.Mouse;
     import flash.utils.ByteArray;
     import flash.utils.Timer;
+    import flash.utils.clearTimeout;
     import flash.utils.setTimeout;
 
     [SWF(backgroundColor="#000000", frameRate="60", width="480", height="270")]
@@ -28,6 +30,7 @@ package{
 
         private var _app:VideoJSApp;
         private var _stageSizeTimer:Timer;
+        private var _intervalId:uint;
 
         public function VideoJS(){
 
@@ -83,6 +86,7 @@ package{
                 ExternalInterface.addCallback("vjs_pause", onPauseCalled);
                 ExternalInterface.addCallback("vjs_resume", onResumeCalled);
                 ExternalInterface.addCallback("vjs_stop", onStopCalled);
+                ExternalInterface.addCallback("vjs_changeLevel", onChangeLevelCalled);
             }
             catch(e:SecurityError){
                 if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
@@ -170,6 +174,7 @@ package{
         private function onAddedToStage(e:Event):void{
             stage.addEventListener(MouseEvent.CLICK, onStageClick);
             stage.addEventListener(Event.RESIZE, onStageResize);
+            stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMovement);
             stage.scaleMode = StageScaleMode.NO_SCALE;
             stage.align = StageAlign.TOP_LEFT;
             _stageSizeTimer.start();
@@ -188,6 +193,18 @@ package{
                 _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
                 _app.model.broadcastEvent(new VideoJSEvent(VideoJSEvent.STAGE_RESIZE, {}));
             }
+        }
+
+        private function onStageMovement(e:Event):void {
+          if(_intervalId) {
+            clearTimeout(_intervalId);
+          }
+
+          Mouse.show();
+
+          _intervalId = setTimeout(function(){
+            Mouse.hide();
+          }, 2000);
         }
 
         private function onAppendBufferCalled(base64str:String):void{
@@ -425,6 +442,10 @@ package{
 
         private function onStopCalled():void{
             _app.model.stop();
+        }
+
+        private function onChangeLevelCalled(level:Number):void{
+          _app.model.level = level;
         }
 
         private function onUncaughtError(e:Event):void{

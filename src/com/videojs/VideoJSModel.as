@@ -45,6 +45,7 @@ package com.videojs{
         private var _rtmpStream:String = "";
         private var _poster:String = "";
         private var _parameters:Object;
+        private var _level:Number;
 
         private static var _instance:VideoJSModel;
 

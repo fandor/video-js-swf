@@ -1,7 +1,7 @@
 package com.videojs.structs{
-    
+
     public class ExternalEventName{
-        
+
         public static const ON_SRC_CHANGE:String = "onsrcchange";
         public static const ON_LOAD_START:String = "loadstart";
         public static const ON_START:String = "playing";
@@ -18,11 +18,16 @@ package com.videojs.structs{
         public static const ON_CAN_PLAY:String = "canplay";
         public static const ON_CAN_PLAY_THROUGH:String = "canplaythrough";
         public static const ON_VOLUME_CHANGE:String = "volumechange";
-        
+
+        // custom external event
+        public static const ON_METRICS:String = "metrics";
+        public static const ON_LEVELS:String = "levels";
+        public static const ON_ERROR:String = "as3error";
+
         public static const ON_RTMP_CONNECT_SUCCESS:String = "rtmpconnected";
         public static const ON_RTMP_RETRY:String = "rtmpretry";
         public static const ON_STAGE_CLICK:String = "stageclick";
         public static const ON_LEVEL_SWITCH:String = "levelswitch";
-        
+
     }
 }

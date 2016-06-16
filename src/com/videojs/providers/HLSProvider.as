@@ -48,6 +48,7 @@ package com.videojs.providers{
         private var _bytesLoaded:Number = 0;
         private var _bytesTotal:Number = 0;
         private var _bufferedTime:Number = 0;
+        private var _level:Number = 0;
 
         public function HLSProvider() {
           Log.info("https://github.com/mangui/flashls/releases/tag/v0.4.1.1");
@@ -61,6 +62,8 @@ package com.videojs.providers{
           _hls.addEventListener(HLSEvent.PLAYBACK_STATE,_playbackStateHandler);
           _hls.addEventListener(HLSEvent.SEEK_STATE,_seekStateHandler);
           _hls.addEventListener(HLSEvent.LEVEL_SWITCH,_levelSwitchHandler);
+          _hls.addEventListener(HLSEvent.FRAGMENT_LOADED,_levelSwitchHandler);
+
         }
 
         private function _completeHandler(event:HLSEvent):void {
@@ -92,11 +95,14 @@ package com.videojs.providers{
           _duration = event.levels[0].duration;
           _metadata.width = event.levels[0].width;
           _metadata.height = event.levels[0].height;
+
           if(_isAutoPlay || _looping) {
             _looping = false;
             play();
           }
           _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
+          _model.broadcastEventExternally(ExternalEventName.ON_METRICS, event.loadMetrics.bandwidth);
+          _model.broadcastEventExternally(ExternalEventName.ON_LEVELS, JSON.stringify(event.levels));
           _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
           _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
           _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
@@ -185,6 +191,7 @@ package com.videojs.providers{
             var height:Number = _hls.levels[levelIndex].height;
             Log.info("HLSProvider: new level index " + levelIndex + " bitrate=" + bitrate + ", width=" + width + ", height=" + height);
             _model.broadcastEventExternally(ExternalEventName.ON_LEVEL_SWITCH, {levelIndex: levelIndex, bitrate: bitrate, width: width, height: height});
+            _model.broadcastEventExternally(ExternalEventName.ON_METRICS, event.loadMetrics.bandwidth);
         }
 
         private function _onFrame(event:Event):void
